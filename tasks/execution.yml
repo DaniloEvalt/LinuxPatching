@@ -1,0 +1,90 @@
+- name: Clean yum cache
+  ansible.builtin.shell:
+    cmd: yum clean all
+  when:
+    - ansible_facts['ansible_distribution] == "CentOS"
+  tags:
+    - execution
+
+- name: Update server with security packages
+  yum:
+    name: '*'
+    state: latest
+    security: yes
+  when:
+    - ansible_facts['ansible_distribution] == "CentOS"
+  tags:
+    - execution
+
+- name: autoremove any orphaned deps
+  yum:
+    autoremove: yes
+  when:
+    - ansible_facts['ansible_distribution] == "CentOS"
+  tags:
+    - execution
+
+- name: Remove old kernel
+  ansible.builtin.shell:
+    cmd: sudo package-cleanup --oldkernels --count=1 -y
+  when:
+    - ansible_facts['ansible_distribution] == "CentOS"
+  tags:
+    - execution
+
+- name: Disable avahi-daemon service
+  ansible.builtin.shell:
+    cmd: '[ $(sudo /sbin/chkconfig --list | grep avahi-daemon | wc -l) = 1 ] && { sudo /sbin/chkconfig avahi-daemon off && echo "Servico avahi-daemon desabilitado"; } || { echo "Servico nao existe"; }'
+  when:
+    - ansible_facts['ansible_distribution] == "CentOS"
+  tags:
+    - execution
+
+- name: Ensure avahi-daemon service is stopped
+  ansible.builtin.systemd:
+    state: stopped
+    name: avahi-daemon
+  ignore_errors: yes
+  when:
+    - ansible_facts['ansible_distribution] == "CentOS"
+  tags:
+    - execution
+
+- name: Running APT-GET Update
+  shell: apt-get update
+  when:
+    - ansible_facts['ansible_distribution] == "Ubuntu"
+  tags:
+    - execution
+
+- name: Running unattended-upgrades
+  shell: unattended-upgrades
+  ignore_errors: true
+  when:
+    - ansible_facts['ansible_distribution] == "Ubuntu"
+  tags:
+    - execution
+    
+- name: Remove dependencies that are no longer required
+  apt:
+    autoremove: yes
+  when:
+    - ansible_facts['ansible_distribution] == "Ubuntu"
+  tags:
+    - execution
+
+- name: Install byobu
+  apt:
+    name: byobu
+    state: present
+  when:
+    - ansible_facts['distribution_release'] == "xenial"
+  tags:
+    - execution
+
+- name: Remove old kernel
+  shell: sudo purge-old-kernels -y
+  when:
+    - ansible_facts['distribution_release'] == "xenial"
+  tags:
+    - execution

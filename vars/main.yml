@@ -1,0 +1,13 @@
+---
+# vars file for updater
+
+# vars Common
+log_final: "/var/log/updater.log"
+
+## vars Ubuntu
+unattended_config: "/etc/apt/apt.conf.d/50unattended-upgrades"
+log_exec_ubuntu: "/var/log/apt/history.log"
+
+## vars CentOS
+yum_config: "/etc/yum.conf"
+log_exec_centos: "/var/log/yum.log"

@@ -1,0 +1,274 @@
+---
+# Setup start for Ubuntu servers
+- name: Check version of OS, if major version == 16 include the repo esm-lw
+  apt_repository:
+    repo: deb [trusted=yes] http://ubuntuesm.mirror.locaweb.com.br xenial-infra-security main
+    state: present
+    update_cache: True
+  when:
+    - ansible_facts['ansible_distribution] == "Ubuntu"
+    - ansible_facts['distribution_release'] == "xenial"
+  tags:
+    - configuration
+
+- name: Apply patch for CVE-2022-25636
+  ansible.builtin.shell:
+    cmd: sudo sysctl kernel.unprivileged_userns_clone=0
+  when:
+    - ansible_facts['ansible_distribution] == "Ubuntu"
+    - ansible_facts['distribution_release'] == "focal"
+  tags:
+    - configuration
+
+- name: Installation of unattended-upgrades
+  apt:
+    name: unattended-upgrades
+    state: present
+  when:
+    - ansible_facts['ansible_distribution] == "Ubuntu"
+  tags:
+    - configuration
+
+- name: Checking unattended-upgrades - Running and active
+  service:
+    name: unattended-upgrades
+    state: started
+    enabled: yes
+  when:
+    - ansible_facts['ansible_distribution] == "Ubuntu"
+  tags:
+    - configuration
+
+- name: Configuring 50unattended-upgrades
+  template:
+    src: unattended_upgrades.j2
+    dest: "{{ unattended_config }}"
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - restart unattended
+  when:
+    - ansible_facts['ansible_distribution] == "Ubuntu"
+  tags:
+    - configuration
+
+# Setup start for CentOS servers
+
+- name: Playbook to add repo's on CentOS 6
+  yum_repository:
+    name: centos6els
+    description: centos6els
+    baseurl: http://repo-lw.tray.net.br/centos6els/$basearch/
+    enabled: yes
+    gpgcheck: no
+  when:
+    - ansible_facts['ansible_distribution] == "CentOS"
+    - ansible_facts['distribution_major_version'] == "6"
+  tags:
+    - configuration
+
+- name: Playbook to add repo's on CentOS 6 - Base
+  yum_repository:
+    name: centos6Base
+    description: base
+    baseurl: http://repo-lw.tray.net.br/centos6/os/$basearch/
+    enabled: yes
+    gpgcheck: no
+  when:
+    - ansible_facts['ansible_distribution] == "CentOS"
+    - ansible_facts['distribution_major_version'] == "6"
+  tags:
+    - configuration
+
+- name: Playbook to add repo's on CentOS 6 - Updates
+  yum_repository:
+    name: centos6Updates
+    description: updates
+    baseurl: http://repo-lw.tray.net.br/centos6/updates/$basearch/
+    enabled: yes
+    gpgcheck: no
+  when:
+    - ansible_facts['ansible_distribution] == "CentOS"
+    - ansible_facts['distribution_major_version'] == "6"
+  tags:
+    - configuration
+
+- name: Playbook to add repo's on CentOS 6 - Extras
+  yum_repository:
+    name: centos6Extras
+    description: extras
+    baseurl: http://repo-lw.tray.net.br/centos6/extras/$basearch/
+    enabled: yes
+    gpgcheck: no
+  when:
+    - ansible_facts['ansible_distribution] == "CentOS"
+    - ansible_facts['distribution_major_version'] == "6"
+  tags:
+    - configuration
+
+- name: Playbook to add repo's on CentOS 6 - Plus
+  yum_repository:
+    name: centos6Plus
+    description: centosplus
+    baseurl: http://repo-lw.tray.net.br/centos6/centosplus/$basearch/
+    enabled: yes
+    gpgcheck: no
+  when:
+    - ansible_facts['ansible_distribution] == "CentOS"
+    - ansible_facts['distribution_major_version'] == "6"
+  tags:
+    - configuration
+
+- name: Playbook to add repo's on CentOS 6 - Contrib
+  yum_repository:
+    name: centos6Contrib
+    description: contrib
+    baseurl: http://repo-lw.tray.net.br/centos6/contrib/$basearch/
+    enabled: yes
+    gpgcheck: no
+  when:
+    - ansible_facts['ansible_distribution] == "CentOS"
+    - ansible_facts['distribution_major_version'] == "6"
+  tags:
+    - configuration
+
+- name: Playbook to add repo's on CentOS 6
+  yum_repository:
+    name: Locaweb
+    description: ECS repo LW
+    baseurl: http://updateinfo.mirror.locaweb.com.br/$releasever/updates/$basearch/
+    enabled: yes
+    gpgcheck: no
+  when:
+    - ansible_facts['ansible_distribution] == "CentOS"
+    - ansible_facts['distribution_major_version'] == "6"
+  tags:
+    - configuration
+
+- name: Playbook to add repo's UpdateInfo on CentOS 6
+  yum_repository:
+    name: updates_cefs
+    description: updates_cefs
+    baseurl: https://sre%40tray.com.br:7e186b0c@updateinfo.cefs.steve-meier.de/$releasever/updates/$basearch/
+    enabled: yes
+    gpgcheck: no
+  when:
+    - ansible_facts['ansible_distribution] == "CentOS"
+    - ansible_facts['distribution_major_version'] == "6"
+  tags:
+    - configuration
+
+- name: Playbook to add repo's on CentOS 7
+  yum_repository:
+    name: Locaweb
+    description: ECS repo LW
+    baseurl: http://updateinfo.mirror.locaweb.com.br/$releasever/updates/$basearch/
+    enabled: yes
+    gpgcheck: no
+  when:
+    - ansible_facts['ansible_distribution] == "CentOS"
+    - ansible_facts['distribution_major_version'] == "7"
+  tags:
+    - configuration
+
+- name: Playbook to add repo's UpdateInfo on CentOS 7
+  yum_repository:
+    name: updates_cefs
+    description: updates_cefs
+    baseurl: https://sre%40tray.com.br:7e186b0c@updateinfo.cefs.steve-meier.de/$releasever/updates/$basearch/
+    enabled: yes
+    gpgcheck: no
+  when:
+    - ansible_facts['ansible_distribution] == "CentOS"
+    - ansible_facts['distribution_major_version'] == "7"
+  tags:
+    - configuration
+
+- name: Playbook to add base repo's on CentOS 7
+  yum_repository:
+    name: base
+    description: CentOSbase
+    baseurl: http://mirror.centos.org/centos/7/os/$basearch/
+    enabled: yes
+    gpgcheck: no
+  when:
+    - ansible_facts['ansible_distribution] == "CentOS"
+    - ansible_facts['distribution_major_version'] == "7"
+  tags:
+    - configuration
+
+- name: Playbook to add Updates repo's on CentOS 7
+  yum_repository:
+    name: update
+    description: update
+    baseurl: http://mirror.centos.org/centos/7/updates/$basearch/
+    enabled: yes
+    gpgcheck: no
+  when:
+    - ansible_facts['ansible_distribution] == "CentOS"
+    - ansible_facts['distribution_major_version'] == "7"
+  tags:
+    - configuration
+
+- name: Playbook to add Extras repo's on CentOS 7
+  yum_repository:
+    name: updates_cefs
+    description: updates_cefs
+    baseurl: http://mirror.centos.org/centos/7/extras/$basearch/
+    enabled: yes
+    gpgcheck: no
+  when:
+    - ansible_facts['ansible_distribution] == "CentOS"
+    - ansible_facts['distribution_major_version'] == "7"
+  tags:
+    - configuration
+
+- name: Ensure the line exclude is not in yum.conf
+  ansible.builtin.lineinfile:
+    path: /etc/yum.conf
+    state: absent
+    regexp: '^exclude'
+  when:
+    - ansible_facts['ansible_distribution] == "CentOS"
+  tags:
+    - configuration
+
+- name: Add the line exclude to end of file
+  ansible.builtin.lineinfile:
+    path: /etc/yum.conf
+    line: exclude = elasticsearch* apache2* bind* httpd* mod_ssl* memcached* mongodb* mysql* newrelic* nginx* node* php* postgresql* redis* salt* sidekiq* sqlite* supervisord* zabbix* gitlab* haproxy* varnish* ruby* puma* goliath* passenger* bundle* gems* npm* graylog* mariadb* node*  influxdb* grafana* python* kubernetes* containerd* docker* webmin* cacti* check* passenger* postfix* yarn* mosquitto* nfa*
+    insertafter: EOF
+  when:
+    - ansible_facts['ansible_distribution] == "CentOS"
+  tags:
+    - configuration
+
+- name: Configuring yum.conf
+  template:
+    src: yum_config.j2
+    dest: "{{ yum_config }}"
+    owner: root
+    group: root
+    mode: '0644'
+  when:
+    - ansible_facts['ansible_distribution] == "CentOS"
+  tags:
+    - configuration
+
+- name: Log file creation CentOS
+  file:
+    path: "{{ log_final }}"
+    state: touch
+    owner: root
+    group: root
+    mode: '0644'
+  register: log
+  changed_when: log.diff.before.state == "absent"
+  when:
+    - ansible_facts['ansible_distribution] == "CentOS"
+  tags:
+    - configuration
+
+
+# End of setup for CentOS servers

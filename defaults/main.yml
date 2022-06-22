@@ -1,0 +1,5 @@
+---
+# defaults file for updater
+
+# Pakage Blacklist
+package_blacklist: [elasticsearch*, apache2*, httpd*, containerd*, docker*, webmin*, cacti*, check*, nfa*, telegraf*, grafana*, influxdb*, memcached*, mongodb*, mysql-server*, newrelic*, nginx*, node*, php*, postgresql*, redis*, salt*, sqlite*, sidekiq*, supervisord*, zabbix*, gitlab*, haproxy*, varnish*, ruby*, puma*, goliath*, passenger*, bundle*, gems*, npm*, graylog*, mariadb*, node*, passenger*, postfix*, yarn*, mosquitto*, kubeamd*, kubelet*, kubectl*, kubernetes-cni*, openjdk*]
